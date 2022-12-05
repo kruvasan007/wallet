@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "649256604617",
+    "project_id": "wallet-3a8e5",
+    "storage_bucket": "wallet-3a8e5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:649256604617:android:85a6c2c07e6015aeee0e18",
+        "android_client_info": {
+          "package_name": "com.example.wallet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "649256604617-s5hlpj9p3kqvfpfcivrtr9lrkg297bd2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDDKB6VS40ENHAocePsHTn-OzTNC0IcZk8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "649256604617-s5hlpj9p3kqvfpfcivrtr9lrkg297bd2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
