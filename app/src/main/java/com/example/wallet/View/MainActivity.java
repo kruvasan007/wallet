@@ -5,8 +5,10 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,6 +25,7 @@ import com.example.wallet.Adpter.CardAdapter;
 import com.example.wallet.Model.Card;
 import com.example.wallet.ViewModel.CardViewModel;
 import com.example.wallet.databinding.ActivityMainBinding;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
 
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private CardViewModel cardViewModel;
     private ImageView addButton;
     private ArrayList<Card> cardArrayList;
+    private EditText input;
 
 
     @Override
@@ -44,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         initRecycler();
         addButton = binding.addButton;
         addButton.setOnClickListener(v -> {
-
+            getNameOfCard();
         });
     }
 
@@ -53,7 +57,6 @@ public class MainActivity extends AppCompatActivity {
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         cardArrayList = new ArrayList<>();
-        cardViewModel.createCard( "KUSINA");
         getTasks();
         cardsRecycler = binding.cardRecycler;
         cardsAdapter = new CardAdapter(this, cardArrayList);
@@ -84,4 +87,23 @@ public class MainActivity extends AppCompatActivity {
             cardsAdapter.notifyDataSetChanged();
         });
     }
+
+    private void getNameOfCard() {
+        input = new EditText(this);
+        input.setMaxWidth(15);
+        input.setPadding(8, 8, 8, 8);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Имя карты")
+                .setView(input)
+                .setPositiveButton("ok", (dialog, which) -> {
+                    String name = String.valueOf(input.getText());
+                    cardViewModel.createCard(name);
+                })
+                .show();
+    }
+
 }
