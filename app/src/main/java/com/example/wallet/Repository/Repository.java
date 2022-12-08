@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Repository {
     final private FirebaseAuth mAuth;
@@ -37,34 +38,32 @@ public class Repository {
                 .set(item);
     }
 
-    private List<Card> getCards(String userId) {
-        List<Card> activities = new ArrayList<>();
-        CollectionReference collectionReference = db.collection("users").document(userId).collection("activities");
-        collectionReference.addSnapshotListener(MetadataChanges.INCLUDE, (value, e) -> {
-            List<DocumentSnapshot> documentSnapshot = value.getDocuments();
-            for (DocumentSnapshot document : documentSnapshot) {
-                Card activity = new Card();
-                activity.setNameCard(String.valueOf(document.getData().get("name")));
-                activities.add(activity);
-            }
-        });
-        return activities;
-    }
-
-    public LiveData<List<Card>> listenCard() {
+    public LiveData<List<Card>> listenCard(String type) {
         final MutableLiveData<List<Card>> data = new MutableLiveData<>();
         CollectionReference collectionReference = db.collection("users")
                 .document(mAuth.getCurrentUser().getUid())
                 .collection("card");
         collectionReference.addSnapshotListener((value, error) -> {
             if (error == null) {
-                System.out.println("*27237172319HFHUDHSUF");
                 List<DocumentSnapshot> documentSnapshot = value.getDocuments();
                 List<Card> cards = new ArrayList<>();
                 for (DocumentSnapshot document : documentSnapshot) {
-                    Card item = new Card();
-                    item.setNameCard(String.valueOf(document.getData().get("name")));
-                    cards.add(item);
+                    if(!type.equals("all")) {
+                        if (String.valueOf(Objects.requireNonNull(document.getData()).get("type")).equals(type)) {
+                            Card item = new Card();
+                            item.setDistance(1000000.0);
+                            item.setNameCard(String.valueOf(document.getData().get("name")));
+                            item.setBarcode(String.valueOf(document.getData().get("code")));
+                            item.setBarcode(String.valueOf(document.getData().get("type")));
+                            cards.add(item);
+                        }
+                    } else{
+                        Card item = new Card();
+                        item.setNameCard(String.valueOf(document.getData().get("name")));
+                        item.setBarcode(String.valueOf(document.getData().get("code")));
+                        item.setBarcode(String.valueOf(document.getData().get("type")));
+                        cards.add(item);
+                    }
                 }
                 cards.sort(Comparator.comparing(Card::getNameCard));
                 data.setValue(cards);

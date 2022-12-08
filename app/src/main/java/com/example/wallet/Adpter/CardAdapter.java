@@ -2,16 +2,23 @@ package com.example.wallet.Adpter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wallet.Model.Card;
 import com.example.wallet.R;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import java.util.ArrayList;
 
@@ -52,14 +59,24 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView nameView;
+        private final ImageView barcode;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             nameView = itemView.findViewById(R.id.name);
+            barcode = itemView.findViewById(R.id.barcode);
         }
 
         public void bind(Card item) {
             nameView.setText(item.getNameCard());
+            try {
+                System.out.println("CREATE");
+                BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+                Bitmap bitmap = barcodeEncoder.encodeBitmap(item.getBarcode(), BarcodeFormat.CODE_128, 120, 40);
+                barcode.setImageBitmap(bitmap);
+            } catch (Exception e) {
+                Log.e("E", "Error create barcode");
+            }
         }
     }
 }

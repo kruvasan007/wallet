@@ -27,15 +27,17 @@ public class CardViewModel extends AndroidViewModel {
         Toast.makeText(getApplication().getBaseContext(), "Delete", Toast.LENGTH_SHORT).show();
     }
 
-    public LiveData<List<Card>> listenActivitiesResponse() {
-        return repository.listenCard();
+    public LiveData<List<Card>> listenActivitiesResponse(String type) {
+        return repository.listenCard(type);
     }
 
-    public void createCard(String name) {
-        if (!name.equals("")) {
+    public void createCard(Card card) {
+        if (!card.getNameCard().equals("")) {
             Map<String, Object> activity = new HashMap<>();
-            activity.put("name", name);
-            repository.createItem(activity, name, "card");
+            activity.put("name", card.getNameCard());
+            activity.put("code", card.getBarcode());
+            activity.put("type", card.getType());
+            repository.createItem(activity, card.getNameCard(), "card");
             Toast.makeText(getApplication().getBaseContext(), "Add new card", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(getApplication().getBaseContext(), "Null field", Toast.LENGTH_SHORT).show();
