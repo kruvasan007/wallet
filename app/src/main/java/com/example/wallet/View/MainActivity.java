@@ -3,11 +3,9 @@ package com.example.wallet.View;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -33,6 +31,7 @@ import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wallet.Adpter.CardAdapter;
+import com.example.wallet.App;
 import com.example.wallet.Model.Card;
 import com.example.wallet.ViewModel.CardViewModel;
 import com.example.wallet.databinding.ActivityMainBinding;
@@ -73,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
     private LinearSnapHelper snapHelper;
     private CardViewModel cardViewModel;
     private ImageView addButton;
-    private MapView mapView;
     private String CATEGORY = "all";
     int PERMISSION_ID = 44;
     FusedLocationProviderClient locationProviderClient;
@@ -82,13 +80,13 @@ public class MainActivity extends AppCompatActivity {
     private Location userLocation;
     private Card newCard;
     private int radius = 10000;
-    private List<Address> addressList;
     private FusedLocationProviderClient locationClient;
     private ImageView addButtonBar;
     private LinearLayout magazineTypeButton;
     private ImageView aboutButton;
     private LinearLayout restaurantTypeBytton;
     private LinearLayout allTypeButton;
+    private ImageView updateButton;
 
 
     @Override
@@ -97,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         //initialization MapKit
-        MapKitFactory.setApiKey("f3d8a01d-d843-4d79-895a-f165fc3fc10c");
         MapKitFactory.initialize(this);
         SearchFactory.initialize(this);
 
@@ -107,9 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        //initialization Map
-        mapView = binding.mapView;
 
         initRecycler();
         addButton = binding.addButton;
@@ -137,13 +131,18 @@ public class MainActivity extends AppCompatActivity {
             getTasks(CATEGORY);
         });
         aboutButton.setOnClickListener(v -> {
-            getLastLocation();
+            Intent intent = new Intent(this, AboutActivity.class);
+            startActivity(intent);
+            onStop();
+        });
+        updateButton = binding.updateButton;
+        updateButton.setOnClickListener(v -> {
             cardArrayList.sort(Comparator.comparing(Card::getDistance));
             cardsAdapter.notifyDataSetChanged();
         });
     }
 
-    private void getOrg(Card card) {
+    private void getNearbyOrganization(Card card) {
         SearchManager searchManager = SearchFactory.getInstance().createSearchManager(
                 SearchManagerType.ONLINE);
         Point userPositionPoint = new Point(userLocation.getLatitude(), userLocation.getLongitude());
@@ -181,11 +180,6 @@ public class MainActivity extends AppCompatActivity {
                         requestNewLocationData();
                     } else {
                         userLocation = location;
-                        Log.e("E", "GET LOCATION");
-                        mapView.getMap().move(
-                                new CameraPosition(new Point(userLocation.getLatitude(), userLocation.getLongitude()), 11.0f, 0.0f, 0.0f),
-                                new Animation(Animation.Type.SMOOTH, 0),
-                                null);
                     }
                 });
             } else {
@@ -291,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
             cardArrayList.clear();
             cardArrayList.addAll(items);
             for (Card card : items) {
-                getOrg(card);
+                getNearbyOrganization(card);
             }
             cardsAdapter.notifyDataSetChanged();
         });
@@ -354,7 +348,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop() {
-        mapView.onStop();
         MapKitFactory.getInstance().onStop();
         super.onStop();
     }
@@ -362,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        getLastLocation();
         MapKitFactory.getInstance().onStart();
-        mapView.onStart();
     }
 }
