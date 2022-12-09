@@ -1,10 +1,15 @@
 package com.example.wallet.View;
 
+import static com.example.wallet.View.WelcomeActivity.userData;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Location;
 import android.location.LocationManager;
@@ -33,6 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.wallet.Adpter.CardAdapter;
 import com.example.wallet.App;
 import com.example.wallet.Model.Card;
+import com.example.wallet.R;
 import com.example.wallet.ViewModel.CardViewModel;
 import com.example.wallet.databinding.ActivityMainBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -49,6 +55,8 @@ import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.geometry.Geometry;
 import com.yandex.mapkit.geometry.Point;
 import com.yandex.mapkit.map.CameraPosition;
+import com.yandex.mapkit.map.GeoObjectSelectionMetadata;
+import com.yandex.mapkit.map.TextStyle;
 import com.yandex.mapkit.mapview.MapView;
 import com.yandex.mapkit.search.BusinessObjectMetadata;
 import com.yandex.mapkit.search.Response;
@@ -58,6 +66,7 @@ import com.yandex.mapkit.search.SearchManagerType;
 import com.yandex.mapkit.search.SearchOptions;
 import com.yandex.mapkit.search.Session;
 import com.yandex.runtime.Error;
+import com.yandex.runtime.image.ImageProvider;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -87,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout restaurantTypeBytton;
     private LinearLayout allTypeButton;
     private ImageView updateButton;
+    private MapView mapview;
+    private Point userPoint;
 
 
     @Override
@@ -98,12 +109,16 @@ public class MainActivity extends AppCompatActivity {
         MapKitFactory.initialize(this);
         SearchFactory.initialize(this);
 
-        //GetLocation
-        locationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-        getLastLocation();
-
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        mapview = binding.mapView;
+        userPoint = new Point(userData.userLocation.getLatitude(), userData.userLocation.getLongitude());
+        setUserPoint();
+        mapview.getMap().move(
+                new CameraPosition(userPoint, 14.0f, 0.0f, 0.0f),
+                new Animation(Animation.Type.SMOOTH, 0),
+                null);
 
         initRecycler();
         addButton = binding.addButton;
@@ -112,10 +127,13 @@ public class MainActivity extends AppCompatActivity {
         restaurantTypeBytton = binding.restaurantTypeButton;
         allTypeButton = binding.allTypeButton;
         aboutButton = binding.faqButton;
+
         addButton.setOnClickListener(v -> {
+            newCard = new Card();
             startScanningBarcode();
         });
         addButtonBar.setOnClickListener(v -> {
+            newCard = new Card();
             startScanningBarcode();
         });
         magazineTypeButton.setOnClickListener(v -> {
@@ -142,10 +160,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setUserPoint() {
+        mapview.getMap().getMapObjects().addPlacemark(userPoint).setIcon(ImageProvider.fromBitmap(getIconFromDrawables(getDrawable(R.drawable.user))));
+    }
+
+    private Bitmap getIconFromDrawables(Drawable drawable) {
+        Canvas canvas = new Canvas();
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        canvas.setBitmap(bitmap);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        drawable.draw(canvas);
+        return bitmap;
+    }
+
     private void getNearbyOrganization(Card card) {
         SearchManager searchManager = SearchFactory.getInstance().createSearchManager(
                 SearchManagerType.ONLINE);
-        Point userPositionPoint = new Point(userLocation.getLatitude(), userLocation.getLongitude());
+        Point userPositionPoint = new Point(userData.userLocation.getLatitude(), userData.userLocation.getLongitude());
         Geometry point = Geometry.fromPoint(userPositionPoint);
         SearchOptions options = new SearchOptions().setGeometry(true).setUserPosition(userPositionPoint);
         searchSession = searchManager.submit(card.getNameCard(), point, options, new Session.SearchListener() {
@@ -156,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
                 if (sortResponse.size() != 0) {
                     if (Objects.requireNonNull(sortResponse.get(0).getObj()).getMetadataContainer().getItem(BusinessObjectMetadata.class).getDistance() != null) {
                         card.setDistance(Objects.requireNonNull(sortResponse.get(0).getObj().getMetadataContainer().getItem(BusinessObjectMetadata.class).getDistance()).getValue());
+                        mapview.getMap().getMapObjects().addPlacemark(Objects.requireNonNull(sortResponse.get(0).getObj()).getGeometry().get(0).getPoint()).setIcon(ImageProvider.fromBitmap(getIconFromDrawables(getDrawable(R.drawable.marker))));
                     } else
                         card.setDistance(100000.0);
                 } else {
@@ -179,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                     if (location == null) {
                         requestNewLocationData();
                     } else {
-                        userLocation = location;
+                        userData.userLocation = location;
                     }
                 });
             } else {
@@ -206,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
     private LocationCallback mLocationCallback = new LocationCallback() {
         @Override
         public void onLocationResult(LocationResult locationResult) {
-            userLocation = locationResult.getLastLocation();
+            userData.userLocation = locationResult.getLastLocation();
         }
     };
 
@@ -275,6 +307,10 @@ public class MainActivity extends AppCompatActivity {
                 cardViewModel.deleteCard(cardArrayList.get(viewHolder.getAdapterPosition()).getNameCard());
                 cardArrayList.remove(viewHolder.getAdapterPosition());
                 cardsAdapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+
+                mapview.getMap().getMapObjects().clear();
+                getTasks(CATEGORY);
+                setUserPoint();
             }
         }).attachToRecyclerView(cardsRecycler);
 
@@ -303,7 +339,6 @@ public class MainActivity extends AppCompatActivity {
             if (result.getContents() == null) {
                 Toast.makeText(this, "Cancelled", Toast.LENGTH_SHORT).show();
             } else {
-                newCard = new Card();
                 newCard.setBarcode(result.getContents());
                 Toast.makeText(this, "Scanned!", Toast.LENGTH_SHORT).show();
                 getTypeOfCard(newCard);
@@ -354,8 +389,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStart() {
-        super.onStart();
-        getLastLocation();
         MapKitFactory.getInstance().onStart();
+        super.onStart();
     }
 }

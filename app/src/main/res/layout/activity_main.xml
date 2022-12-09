@@ -17,6 +17,14 @@
         android:padding="16dp"
         android:layout_margin="8dp"
         />
+
+
+    <com.yandex.mapkit.mapview.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="340dp"
+        app:layout_constraintBottom_toTopOf="@id/downBar"
+        android:layout_marginBottom="-16dp"/>
     <LinearLayout
         android:id="@+id/container_recycler"
         android:layout_width="match_parent"
@@ -29,7 +37,7 @@
             android:id="@+id/add_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_margin="12dp"
+            android:layout_margin="8dp"
             android:src="@drawable/add_button"
             app:layout_constraintBottom_toBottomOf="@id/container_recycler"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -64,7 +72,7 @@
         android:id="@+id/category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginLeft="16dp"
         android:fontFamily="@font/montserrat"
         android:text="Категории"
         android:textColor="@color/white"

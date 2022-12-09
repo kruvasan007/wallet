@@ -19,6 +19,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import com.example.wallet.UserData;
 import com.example.wallet.ViewModel.UserViewModel;
 import com.example.wallet.databinding.ActivityWelcomeBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -29,6 +30,7 @@ import com.google.android.gms.location.LocationServices;
 
 public class WelcomeActivity extends AppCompatActivity {
     private ActivityWelcomeBinding binding;
+    public static UserData userData;
     private UserViewModel userAuthViewModel;
     private FusedLocationProviderClient locationClient;
     private Location userLocation;
@@ -41,7 +43,7 @@ public class WelcomeActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-
+        userData = new UserData();
         if (!checkPermissions())
             requestPermissions();
 
@@ -85,7 +87,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     if (location == null) {
                         requestNewLocationData();
                     } else {
-                        userLocation = location;
+                        userData.userLocation = location;
                         startMainActivity();
                     }
                 });

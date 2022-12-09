@@ -1,6 +1,5 @@
 package com.example.wallet.Adpter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -9,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,13 +15,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.wallet.Model.Card;
 import com.example.wallet.R;
 import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import java.util.ArrayList;
 
 public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
     private ArrayList<Card> cardList;
+
+    protected static View lastTransport;
     private int snapPosition = RecyclerView.NO_POSITION;
     private int lastPosition = -1;
 
@@ -70,12 +69,11 @@ public class CardAdapter extends RecyclerView.Adapter<CardAdapter.ViewHolder> {
         public void bind(Card item) {
             nameView.setText(item.getNameCard());
             try {
-                System.out.println("CREATE");
                 BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-                Bitmap bitmap = barcodeEncoder.encodeBitmap(item.getBarcode(), BarcodeFormat.CODE_128, 120, 40);
+                Bitmap bitmap = barcodeEncoder.encodeBitmap(item.getBarcode(), BarcodeFormat.CODE_128, 200, 40);
                 barcode.setImageBitmap(bitmap);
             } catch (Exception e) {
-                Log.e("E", "Error create barcode");
+                Log.e("E", "Error create barcode" + e.getMessage());
             }
         }
     }

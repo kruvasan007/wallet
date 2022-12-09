@@ -54,14 +54,14 @@ public class Repository {
                             item.setDistance(1000000.0);
                             item.setNameCard(String.valueOf(document.getData().get("name")));
                             item.setBarcode(String.valueOf(document.getData().get("code")));
-                            item.setBarcode(String.valueOf(document.getData().get("type")));
+                            item.setType(String.valueOf(document.getData().get("type")));
                             cards.add(item);
                         }
                     } else{
                         Card item = new Card();
                         item.setNameCard(String.valueOf(document.getData().get("name")));
                         item.setBarcode(String.valueOf(document.getData().get("code")));
-                        item.setBarcode(String.valueOf(document.getData().get("type")));
+                        item.setType(String.valueOf(document.getData().get("type")));
                         cards.add(item);
                     }
                 }
