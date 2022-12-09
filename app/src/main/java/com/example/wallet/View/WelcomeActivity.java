@@ -1,5 +1,7 @@
 package com.example.wallet.View;
 
+import static com.example.wallet.App.userData;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
@@ -30,7 +32,6 @@ import com.google.android.gms.location.LocationServices;
 
 public class WelcomeActivity extends AppCompatActivity {
     private ActivityWelcomeBinding binding;
-    public static UserData userData;
     private UserViewModel userAuthViewModel;
     private FusedLocationProviderClient locationClient;
     private Location userLocation;
@@ -43,7 +44,6 @@ public class WelcomeActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-        userData = new UserData();
         if (!checkPermissions())
             requestPermissions();
 

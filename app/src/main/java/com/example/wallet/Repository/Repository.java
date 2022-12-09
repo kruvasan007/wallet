@@ -19,6 +19,7 @@ import java.util.Objects;
 public class Repository {
     final private FirebaseAuth mAuth;
     private final FirebaseFirestore db;
+    private Double BASE_DISTANCE = 10000000.0;
 
     public Repository() {
         mAuth = FirebaseAuth.getInstance();
@@ -62,6 +63,7 @@ public class Repository {
                         item.setNameCard(String.valueOf(document.getData().get("name")));
                         item.setBarcode(String.valueOf(document.getData().get("code")));
                         item.setType(String.valueOf(document.getData().get("type")));
+                        item.setDistance(BASE_DISTANCE);
                         cards.add(item);
                     }
                 }

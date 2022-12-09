@@ -1,6 +1,6 @@
 package com.example.wallet.View;
 
-import static com.example.wallet.View.WelcomeActivity.userData;
+import static com.example.wallet.App.userData;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -10,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.location.Address;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -36,7 +35,6 @@ import androidx.recyclerview.widget.LinearSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wallet.Adpter.CardAdapter;
-import com.example.wallet.App;
 import com.example.wallet.Model.Card;
 import com.example.wallet.R;
 import com.example.wallet.ViewModel.CardViewModel;
@@ -55,8 +53,6 @@ import com.yandex.mapkit.MapKitFactory;
 import com.yandex.mapkit.geometry.Geometry;
 import com.yandex.mapkit.geometry.Point;
 import com.yandex.mapkit.map.CameraPosition;
-import com.yandex.mapkit.map.GeoObjectSelectionMetadata;
-import com.yandex.mapkit.map.TextStyle;
 import com.yandex.mapkit.mapview.MapView;
 import com.yandex.mapkit.search.BusinessObjectMetadata;
 import com.yandex.mapkit.search.Response;
@@ -183,7 +179,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSearchResponse(@NonNull Response response) {
                 List<GeoObjectCollection.Item> sortResponse = response.getCollection().getChildren();
-                Log.e("G", "GET");
                 if (sortResponse.size() != 0) {
                     if (Objects.requireNonNull(sortResponse.get(0).getObj()).getMetadataContainer().getItem(BusinessObjectMetadata.class).getDistance() != null) {
                         card.setDistance(Objects.requireNonNull(sortResponse.get(0).getObj().getMetadataContainer().getItem(BusinessObjectMetadata.class).getDistance()).getValue());
@@ -262,7 +257,6 @@ public class MainActivity extends AppCompatActivity {
     onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
         if (requestCode == PERMISSION_ID) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 getLastLocation();
